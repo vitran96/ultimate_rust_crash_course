@@ -4,5 +4,6 @@ members = [
     "exercise/a_variables/variables",
     "exercise/b_functions",
     "exercise/c_simple_types",
-    "exercise/d_control_flow_strings"
+    "exercise/d_control_flow_strings",
+    "exercise/e_ownership_references"
 ]
