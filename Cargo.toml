@@ -6,5 +6,6 @@ members = [
     "exercise/c_simple_types",
     "exercise/d_control_flow_strings",
     "exercise/e_ownership_references",
-    "exercise/f_structs_traits"
+    "exercise/f_structs_traits",
+    "exercise/g_collections_enums"
 ]
