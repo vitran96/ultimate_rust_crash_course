@@ -42,7 +42,7 @@ fn main() {
     match subcommand.as_str() {
         // EXAMPLE FOR CONVERSION OPERATIONS
         "blur" => {
-            if args.len() != 2 {
+            if args.len() < 2 {
                 print_usage_and_exit();
             }
             let infile = args.remove(0);
@@ -60,12 +60,17 @@ fn main() {
         // **OPTION**
         // Brighten -- see the brighten() function below
         "brighten" => {
-            if args.len() != 2 {
+            if args.len() < 2 {
                 print_usage_and_exit();
             }
             let infile = args.remove(0);
             let outfile = args.remove(0);
-            brighten(infile, outfile);
+            if args.len() >= 3 {
+                let brighten_amount: i32 = args.remove(0).parse().expect("Failed to parse a number");
+                brighten(infile, outfile, brighten_amount);
+            } else {
+                brighten(infile, outfile, 10);
+            }
         }
 
         // **OPTION**
@@ -121,15 +126,17 @@ fn blur(infile: String, outfile: String, blur_amount: f32) {
     img2.save(outfile).expect("Failed writing OUTFILE.");
 }
 
-fn brighten(infile: String, outfile: String, brighten_amount: f32) {
+fn brighten(infile: String, outfile: String, brighten_amount: i32) {
     // See blur() for an example of how to open / save an image.
     let img: DynamicImage = image::open(infile).expect("Failed to open INFILE.");
 
     // .brighten() takes one argument, an i32.  Positive numbers brighten the
     // image. Negative numbers darken it.  It returns a new image.
+    let img2: DynamicImage = img.brighten(brighten_amount);
 
     // Challenge: parse the brightness amount from the command-line and pass it
     // through to this function.
+    img2.save(outfile).expect("Failed writing OUTFILE.");
 }
 
 fn crop(infile: String, outfile: String) {
