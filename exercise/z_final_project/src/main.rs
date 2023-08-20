@@ -18,7 +18,7 @@
 //
 // For example:
 //
-//     cargo run --release blur image.png blurred.png
+// cargo run --release blur image.png blurred.png
 //
 // NOTE 2: This is how you parse a number from a string (or crash with a
 // message). It works with any integer or float type.
@@ -103,6 +103,15 @@ fn main() {
 
         // **OPTION**
         // Grayscale -- see the grayscale() function below
+        "grayscale" => {
+            if args.len() < 2 {
+                print_usage_and_exit();
+            }
+            
+            let infile = args.remove(0);
+            let outfile = args.remove(0);
+            grayscale(infile, outfile);
+        }
 
         // A VERY DIFFERENT EXAMPLE...a really fun one. :-)
         "fractal" => {
@@ -132,6 +141,8 @@ fn print_usage_and_exit() {
     // println!("...");
     println!("brighten INFILE OUTFILE");
     println!("crop INFILE OUTFILE X Y WIDTH HEIGHT");
+
+    println!("grayscale INFILE OUTFILE");
     std::process::exit(-1);
 }
 
@@ -169,49 +180,55 @@ fn crop(
 ) {
     // See blur() for an example of how to open an image.
     let mut img: DynamicImage = image::open(infile).expect("Failed to open INFILE.");
-
+    
     // .crop() takes four arguments: x: u32, y: u32, width: u32, height: u32
     // You may hard-code them, if you like.  It returns a new image.
     let img2: DynamicImage = img.crop(x, y, width, height);
-
+    
     // Challenge: parse the four values from the command-line and pass them
     // through to this function.
-
+    
     // See blur() for an example of how to save the image.
     img2.save(outfile)
-        .expect("Failed writing OUTFILE.");
+    .expect("Failed writing OUTFILE.");
 }
 
 fn rotate(infile: String, outfile: String) {
     // See blur() for an example of how to open an image.
-
+    let mut img: DynamicImage = image::open(infile).expect("Failed to open INFILE.");
+    
     // There are 3 rotate functions to choose from (all clockwise):
     //   .rotate90()
     //   .rotate180()
     //   .rotate270()
     // All three methods return a new image.  Pick one and use it!
-
+    
     // Challenge: parse the rotation amount from the command-line, pass it
     // through to this function to select which method to call.
-
+    
     // See blur() for an example of how to save the image.
 }
 
 fn invert(infile: String, outfile: String) {
     // See blur() for an example of how to open an image.
-
+    let mut img: DynamicImage = image::open(infile).expect("Failed to open INFILE.");
+    
     // .invert() takes no arguments and converts the image in-place, so you
     // will use the same image to save out to a different file.
-
+    
     // See blur() for an example of how to save the image.
 }
 
 fn grayscale(infile: String, outfile: String) {
     // See blur() for an example of how to open an image.
-
+    let img: DynamicImage = image::open(infile).expect("Failed to open INFILE.");
+    
     // .grayscale() takes no arguments. It returns a new image.
-
+    let img2: DynamicImage = img.grayscale();
+    
     // See blur() for an example of how to save the image.
+    img2.save(outfile)
+        .expect("Failed writing OUTFILE.");
 }
 
 fn generate(outfile: String) {
