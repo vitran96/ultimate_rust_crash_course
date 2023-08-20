@@ -49,12 +49,10 @@ fn main() {
             let outfile = args.remove(0);
             // **OPTION**
             // Improve the blur implementation -- see the blur() function below
-            if args.len() >= 3 {
-                let blur_amount: f32 = args.remove(0).parse().expect("Failed to parse a number");
-                blur(infile, outfile, blur_amount);
-            } else {
-                blur(infile, outfile, 2.0);
-            }
+            let blur_amount: f32 = args.remove(0)
+                .parse()
+                .unwrap_or(2.0);
+            blur(infile, outfile, blur_amount);
         }
 
         // **OPTION**
@@ -63,18 +61,39 @@ fn main() {
             if args.len() < 2 {
                 print_usage_and_exit();
             }
+            
             let infile = args.remove(0);
             let outfile = args.remove(0);
-            if args.len() >= 3 {
-                let brighten_amount: i32 = args.remove(0).parse().expect("Failed to parse a number");
-                brighten(infile, outfile, brighten_amount);
-            } else {
-                brighten(infile, outfile, 10);
-            }
+            let brighten_amount: i32 = args.remove(0)
+                    .parse()
+                    .unwrap_or(10);
+            brighten(infile, outfile, brighten_amount);
         }
 
         // **OPTION**
         // Crop -- see the crop() function below
+        "crop" => {
+            if args.len() < 6 {
+                print_usage_and_exit();
+            }
+            
+            let infile = args.remove(0);
+            let outfile = args.remove(0);
+            let x: u32 = args.remove(0)
+                    .parse()
+                    .expect("Failed to parse x for CROP");
+            let y: u32 = args.remove(0)
+                    .parse()
+                    .expect("Failed to parse y for CROP");
+            let width: u32 = args.remove(0)
+                    .parse()
+                    .expect("Failed to parse width for CROP");
+            let height: u32 = args.remove(0)
+                    .parse()
+                    .expect("Failed to parse height for CROP");
+
+            crop(infile, outfile, x, y, width, height);
+        }
 
         // **OPTION**
         // Rotate -- see the rotate() function below
@@ -112,6 +131,7 @@ fn print_usage_and_exit() {
     // Print useful information about what subcommands and arguments you can use
     // println!("...");
     println!("brighten INFILE OUTFILE");
+    println!("crop INFILE OUTFILE X Y WIDTH HEIGHT");
     std::process::exit(-1);
 }
 
@@ -129,26 +149,37 @@ fn blur(infile: String, outfile: String, blur_amount: f32) {
 fn brighten(infile: String, outfile: String, brighten_amount: i32) {
     // See blur() for an example of how to open / save an image.
     let img: DynamicImage = image::open(infile).expect("Failed to open INFILE.");
-
+    
     // .brighten() takes one argument, an i32.  Positive numbers brighten the
     // image. Negative numbers darken it.  It returns a new image.
     let img2: DynamicImage = img.brighten(brighten_amount);
-
+    
     // Challenge: parse the brightness amount from the command-line and pass it
     // through to this function.
     img2.save(outfile).expect("Failed writing OUTFILE.");
 }
 
-fn crop(infile: String, outfile: String) {
+fn crop(
+    infile: String
+    , outfile: String
+    , x: u32
+    , y: u32
+    , width: u32
+    , height: u32
+) {
     // See blur() for an example of how to open an image.
+    let mut img: DynamicImage = image::open(infile).expect("Failed to open INFILE.");
 
     // .crop() takes four arguments: x: u32, y: u32, width: u32, height: u32
     // You may hard-code them, if you like.  It returns a new image.
+    let img2: DynamicImage = img.crop(x, y, width, height);
 
     // Challenge: parse the four values from the command-line and pass them
     // through to this function.
 
     // See blur() for an example of how to save the image.
+    img2.save(outfile)
+        .expect("Failed writing OUTFILE.");
 }
 
 fn rotate(infile: String, outfile: String) {
