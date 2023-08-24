@@ -25,6 +25,8 @@
 //
 //     let positive_number: u32 = some_string.parse().expect("Failed to parse a number");
 
+use std::io::Error;
+
 use image::DynamicImage;
 
 fn main() {
@@ -97,6 +99,19 @@ fn main() {
 
         // **OPTION**
         // Rotate -- see the rotate() function below
+        "rotate" => {
+            if args.len() < 2 {
+                print_usage_and_exit();
+            }
+            
+            let infile = args.remove(0);
+            let outfile = args.remove(0);
+            let rotation_amount: u32 = args.remove(0)
+                    .parse()
+                    .unwrap_or(90);
+            rotate(infile, outfile, rotation_amount)
+                .expect("Failed to rotate image");
+        }
 
         // **OPTION**
         // Invert -- see the invert() function below
@@ -141,6 +156,7 @@ fn print_usage_and_exit() {
     // println!("...");
     println!("brighten INFILE OUTFILE");
     println!("crop INFILE OUTFILE X Y WIDTH HEIGHT");
+    println!("rotate INFILE OUTFILE DEGREES{{90, 180, 270}}");
 
     println!("grayscale INFILE OUTFILE");
     std::process::exit(-1);
@@ -190,12 +206,12 @@ fn crop(
     
     // See blur() for an example of how to save the image.
     img2.save(outfile)
-    .expect("Failed writing OUTFILE.");
+        .expect("Failed writing OUTFILE.");
 }
 
-fn rotate(infile: String, outfile: String) {
+fn rotate(infile: String, outfile: String, rotation_amount: u32) -> Result<String, std::io::Error> {
     // See blur() for an example of how to open an image.
-    let mut img: DynamicImage = image::open(infile).expect("Failed to open INFILE.");
+    let img: DynamicImage = image::open(infile).expect("Failed to open INFILE.");
     
     // There are 3 rotate functions to choose from (all clockwise):
     //   .rotate90()
@@ -205,8 +221,22 @@ fn rotate(infile: String, outfile: String) {
     
     // Challenge: parse the rotation amount from the command-line, pass it
     // through to this function to select which method to call.
-    
+    let img2: DynamicImage;
+    if rotation_amount == 90 {
+        img2 = img.rotate90();
+    } else if rotation_amount == 180 {
+        img2 = img.rotate180();
+    } else if rotation_amount == 270 {
+        img2 = img.rotate270();
+    } else {
+        panic!("Invalid rotation amount")
+    }
+
     // See blur() for an example of how to save the image.
+    img2.save(outfile)
+        .expect("Failed writing OUTFILE.");
+    
+    Ok(String::from("a"))
 }
 
 fn invert(infile: String, outfile: String) {
