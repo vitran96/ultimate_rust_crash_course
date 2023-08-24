@@ -115,6 +115,15 @@ fn main() {
 
         // **OPTION**
         // Invert -- see the invert() function below
+        "invert" => {
+            if args.len() < 2 {
+                print_usage_and_exit();
+            }
+            
+            let infile = args.remove(0);
+            let outfile = args.remove(0);
+            invert(infile, outfile);
+        }
 
         // **OPTION**
         // Grayscale -- see the grayscale() function below
@@ -139,6 +148,13 @@ fn main() {
 
         // **OPTION**
         // Generate -- see the generate() function below -- this should be sort of like "fractal()"!
+        "generate" => {
+            if args.len() != 1 {
+                print_usage_and_exit();
+            }
+            let outfile = args.remove(0);
+            generate(outfile);
+        }
 
         // For everything else...
         _ => {
@@ -245,8 +261,11 @@ fn invert(infile: String, outfile: String) {
     
     // .invert() takes no arguments and converts the image in-place, so you
     // will use the same image to save out to a different file.
+    img.invert();
     
     // See blur() for an example of how to save the image.
+    img.save(outfile)
+        .expect("Failed writing OUTFILE.");
 }
 
 fn grayscale(infile: String, outfile: String) {
