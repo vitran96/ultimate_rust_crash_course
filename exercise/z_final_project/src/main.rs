@@ -25,8 +25,6 @@
 //
 //     let positive_number: u32 = some_string.parse().expect("Failed to parse a number");
 
-use std::io::Error;
-
 use image::DynamicImage;
 
 fn main() {
@@ -282,10 +280,22 @@ fn grayscale(infile: String, outfile: String) {
 
 fn generate(outfile: String) {
     // Create an ImageBuffer -- see fractal() for an example
+    let width = 800;
+    let height = 800;
+    let mut imgbuf = image::ImageBuffer::new(width, height);
 
     // Iterate over the coordinates and pixels of the image -- see fractal() for an example
-
     // Set the image to some solid color. -- see fractal() for an example
+
+    for (_, _, pixel) in imgbuf.enumerate_pixels_mut() {
+        let red : u8= 50; 
+        let blue: u8 = 50;
+        let green:u8 = 0;
+
+        // Actually set the pixel. red, green, and blue are u8 values!
+        *pixel = image::Rgb([red, green, blue]);
+    }
+
 
     // Challenge: parse some color data from the command-line, pass it through
     // to this function to use for the solid color.
@@ -293,6 +303,8 @@ fn generate(outfile: String) {
     // Challenge 2: Generate something more interesting!
 
     // See blur() for an example of how to save the image
+    imgbuf.save(outfile)
+        .unwrap();
 }
 
 // This code was adapted from https://github.com/PistonDevelopers/image
