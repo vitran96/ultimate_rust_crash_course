@@ -1,30 +1,3 @@
-// FINAL PROJECT
-//
-// Create an image processing application.  Exactly what it does and how it does
-// it is up to you, though I've stubbed a good amount of suggestions for you.
-// Look for comments labeled **OPTION** below.
-//
-// Two image files are included in the project root for your convenience: dyson.png and pens.png
-// Feel free to use them or provide (or generate) your own images.
-//
-// Don't forget to have fun and play around with the code!
-//
-// Documentation for the image library is here: https://docs.rs/image/0.21.0/image/
-//
-// NOTE 1: Image processing is very CPU-intensive.  Your program will run *noticeably* faster if you
-// run it with the `--release` flag.
-//
-//     cargo run --release [ARG1 [ARG2]]
-//
-// For example:
-//
-// cargo run --release blur image.png blurred.png
-//
-// NOTE 2: This is how you parse a number from a string (or crash with a
-// message). It works with any integer or float type.
-//
-//     let positive_number: u32 = some_string.parse().expect("Failed to parse a number");
-
 use image::DynamicImage;
 
 fn main() {
@@ -37,11 +10,16 @@ fn main() {
     let mut args: Vec<String> = std::env::args()
         .skip(1)
         .collect();
-    if args.is_empty() {
+    if args.len() < 3 {
         print_usage_and_exit();
     }
     
     //
+    let infile = args.remove(0);
+    let outfile = args.remove(0);
+    
+    let mut img: DynamicImage = image::open(infile)
+        .expect("Failed to open INFILE.");
 
     let subcommand = args.remove(0);
 
@@ -51,8 +29,6 @@ fn main() {
             if args.len() < 2 {
                 print_usage_and_exit();
             }
-            let infile = args.remove(0);
-            let outfile = args.remove(0);
             // **OPTION**
             // Improve the blur implementation -- see the blur() function below
             let blur_amount: f32 = args.remove(0)
@@ -129,8 +105,6 @@ fn main() {
             invert(infile, outfile);
         }
 
-        // **OPTION**
-        // Grayscale -- see the grayscale() function below
         "grayscale" => {
             if args.len() < 2 {
                 print_usage_and_exit();
@@ -159,81 +133,41 @@ fn print_usage_and_exit() {
     std::process::exit(-1);
 }
 
-fn blur(infile: String, outfile: String, blur_amount: f32) {
+fn blur(img: DynamicImage, blur_amount: f32) -> DynamicImage {
     // Here's how you open an existing image file
-    let img = image::open(infile).expect("Failed to open INFILE.");
-    // **OPTION**
-    // Parse the blur amount (an f32) from the command-line and pass it through
-    // to this function, instead of hard-coding it to 2.0.
-    let img2 = img.blur(blur_amount);
-    // Here's how you save an image to a file.
-    img2.save(outfile).expect("Failed writing OUTFILE.");
+    img.blur(blur_amount)
 }
 
-fn brighten(infile: String, outfile: String, brighten_amount: i32) {
-    // See blur() for an example of how to open / save an image.
-    let img: DynamicImage = image::open(infile).expect("Failed to open INFILE.");
-    
-    // .brighten() takes one argument, an i32.  Positive numbers brighten the
-    // image. Negative numbers darken it.  It returns a new image.
-    let img2: DynamicImage = img.brighten(brighten_amount);
-    
-    // Challenge: parse the brightness amount from the command-line and pass it
-    // through to this function.
-    img2.save(outfile).expect("Failed writing OUTFILE.");
+fn brighten(img: DynamicImage, brighten_amount: i32) -> DynamicImage {
+    img.brighten(brighten_amount)
 }
 
 fn crop(
-    infile: String
+    mut img: DynamicImage
     , outfile: String
     , x: u32
     , y: u32
     , width: u32
     , height: u32
-) {
-    // See blur() for an example of how to open an image.
-    let mut img: DynamicImage = image::open(infile).expect("Failed to open INFILE.");
-    
-    // .crop() takes four arguments: x: u32, y: u32, width: u32, height: u32
-    // You may hard-code them, if you like.  It returns a new image.
-    let img2: DynamicImage = img.crop(x, y, width, height);
-    
-    // Challenge: parse the four values from the command-line and pass them
-    // through to this function.
-    
-    // See blur() for an example of how to save the image.
-    img2.save(outfile)
-        .expect("Failed writing OUTFILE.");
+) -> DynamicImage {
+    img.crop(x, y, width, height)
 }
 
-fn rotate(infile: String, outfile: String, rotation_amount: u32) -> Result<String, std::io::Error> {
-    // See blur() for an example of how to open an image.
-    let img: DynamicImage = image::open(infile).expect("Failed to open INFILE.");
-    
-    // There are 3 rotate functions to choose from (all clockwise):
-    //   .rotate90()
-    //   .rotate180()
-    //   .rotate270()
-    // All three methods return a new image.  Pick one and use it!
-    
+fn rotate(infile: DynamicImage, rotation_amount: u32) {
     // Challenge: parse the rotation amount from the command-line, pass it
     // through to this function to select which method to call.
-    let img2: DynamicImage;
-    if rotation_amount == 90 {
-        img2 = img.rotate90();
-    } else if rotation_amount == 180 {
-        img2 = img.rotate180();
-    } else if rotation_amount == 270 {
-        img2 = img.rotate270();
-    } else {
-        panic!("Invalid rotation amount")
-    }
+    // let img2: DynamicImage;
+    // if rotation_amount == 90 {
+    //     img2 = img.rotate90();
+    // } else if rotation_amount == 180 {
+    //     img2 = img.rotate180();
+    // } else if rotation_amount == 270 {
+    //     img2 = img.rotate270();
+    // } else {
+    //     panic!("Invalid rotation amount")
+    // }
 
-    // See blur() for an example of how to save the image.
-    img2.save(outfile)
-        .expect("Failed writing OUTFILE.");
-    
-    Ok(String::from("a"))
+    // Ok(String::from("Ok"))
 }
 
 fn invert(infile: String, outfile: String) {
@@ -249,16 +183,8 @@ fn invert(infile: String, outfile: String) {
         .expect("Failed writing OUTFILE.");
 }
 
-fn grayscale(infile: String, outfile: String) {
-    // See blur() for an example of how to open an image.
-    let img: DynamicImage = image::open(infile).expect("Failed to open INFILE.");
-    
-    // .grayscale() takes no arguments. It returns a new image.
-    let img2: DynamicImage = img.grayscale();
-    
-    // See blur() for an example of how to save the image.
-    img2.save(outfile)
-        .expect("Failed writing OUTFILE.");
+fn grayscale(img: DynamicImage) -> DynamicImage {
+    img.grayscale()
 }
 
 // **SUPER CHALLENGE FOR LATER** - Let's face it, you don't have time for this during class.
